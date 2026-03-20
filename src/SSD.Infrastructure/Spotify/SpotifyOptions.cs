@@ -16,5 +16,9 @@ public sealed class SpotifyOptions
 
     public string ApiBaseUrl { get; set; } = "https://api.spotify.com/v1/";
 
-    public string Scopes { get; set; } = "user-read-email user-read-private";
+    public string Scopes { get; set; } = "user-read-email user-read-private user-top-read";
+
+    public int RecommendationTopTrackLimit { get; set; } = 5;
+
+    public int RecommendationTopArtistLimit { get; set; } = 5;
 }

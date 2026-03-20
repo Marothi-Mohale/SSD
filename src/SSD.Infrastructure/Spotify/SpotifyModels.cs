@@ -76,6 +76,9 @@ public sealed class SpotifyExternalUrls
 
 public sealed class SpotifyArtist
 {
+    [JsonPropertyName("id")]
+    public string? Id { get; set; }
+
     [JsonPropertyName("name")]
     public string Name { get; set; } = string.Empty;
 }
@@ -99,4 +102,91 @@ public sealed class SpotifyImage
 
     [JsonPropertyName("width")]
     public int? Width { get; set; }
+}
+
+public sealed class SpotifyArtistApiResponse
+{
+    [JsonPropertyName("id")]
+    public string Id { get; set; } = string.Empty;
+
+    [JsonPropertyName("name")]
+    public string Name { get; set; } = string.Empty;
+
+    [JsonPropertyName("genres")]
+    public List<string> Genres { get; set; } = [];
+
+    [JsonPropertyName("popularity")]
+    public int Popularity { get; set; }
+
+    [JsonPropertyName("followers")]
+    public SpotifyFollowers? Followers { get; set; }
+
+    [JsonPropertyName("images")]
+    public List<SpotifyImage> Images { get; set; } = [];
+
+    [JsonPropertyName("external_urls")]
+    public SpotifyExternalUrls? ExternalUrls { get; set; }
+}
+
+public sealed class SpotifyFollowers
+{
+    [JsonPropertyName("total")]
+    public int Total { get; set; }
+}
+
+public sealed class SpotifyPlaylistApiResponse
+{
+    [JsonPropertyName("id")]
+    public string Id { get; set; } = string.Empty;
+
+    [JsonPropertyName("name")]
+    public string Name { get; set; } = string.Empty;
+
+    [JsonPropertyName("description")]
+    public string? Description { get; set; }
+
+    [JsonPropertyName("collaborative")]
+    public bool Collaborative { get; set; }
+
+    [JsonPropertyName("public")]
+    public bool? Public { get; set; }
+
+    [JsonPropertyName("owner")]
+    public SpotifyPlaylistOwner? Owner { get; set; }
+
+    [JsonPropertyName("images")]
+    public List<SpotifyImage> Images { get; set; } = [];
+
+    [JsonPropertyName("external_urls")]
+    public SpotifyExternalUrls? ExternalUrls { get; set; }
+
+    [JsonPropertyName("tracks")]
+    public SpotifyPlaylistTracks? Tracks { get; set; }
+}
+
+public sealed class SpotifyPlaylistOwner
+{
+    [JsonPropertyName("display_name")]
+    public string? DisplayName { get; set; }
+}
+
+public sealed class SpotifyPlaylistTracks
+{
+    [JsonPropertyName("total")]
+    public int Total { get; set; }
+
+    [JsonPropertyName("items")]
+    public List<SpotifyPlaylistTrackItem> Items { get; set; } = [];
+}
+
+public sealed class SpotifyPlaylistTrackItem
+{
+    [JsonPropertyName("track")]
+    public SpotifyTrackApiResponse? Track { get; set; }
+}
+
+public sealed class SpotifyPagingResponse<T>
+{
+    [JsonPropertyName("items")]
+    public List<T> Items { get; set; } = [];
 }

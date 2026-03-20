@@ -36,6 +36,7 @@ public static class DependencyInjection
                 options.ClientId = configuration["SSD_SPOTIFY_CLIENT_ID"] ?? options.ClientId;
                 options.ClientSecret = configuration["SSD_SPOTIFY_CLIENT_SECRET"] ?? options.ClientSecret;
                 options.RedirectUri = configuration["SSD_SPOTIFY_REDIRECT_URI"] ?? options.RedirectUri;
+                options.Scopes = configuration["SSD_SPOTIFY_SCOPES"] ?? options.Scopes;
             })
             .Validate(options => !string.IsNullOrWhiteSpace(options.ClientId), "Spotify client id must be configured.")
             .Validate(options => !string.IsNullOrWhiteSpace(options.ClientSecret), "Spotify client secret must be configured.")

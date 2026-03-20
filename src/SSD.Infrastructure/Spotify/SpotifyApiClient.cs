@@ -12,13 +12,14 @@ public sealed class SpotifyApiClient(HttpClient httpClient, IOptions<SpotifyOpti
     private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
     private readonly SpotifyOptions _options = options.Value;
 
-    public async Task<SpotifyTokenResponse> ExchangeCodeAsync(string code, CancellationToken cancellationToken)
+    public async Task<SpotifyTokenResponse> ExchangeCodeAsync(string code, string codeVerifier, CancellationToken cancellationToken)
     {
         using var content = new FormUrlEncodedContent(new Dictionary<string, string>
         {
             ["grant_type"] = "authorization_code",
             ["code"] = code,
             ["redirect_uri"] = _options.RedirectUri,
+            ["code_verifier"] = codeVerifier,
             ["client_id"] = _options.ClientId,
             ["client_secret"] = _options.ClientSecret
         });
@@ -56,7 +57,7 @@ public sealed class SpotifyApiClient(HttpClient httpClient, IOptions<SpotifyOpti
 
     public async Task<SpotifyCurrentUserResponse> GetCurrentUserAsync(string accessToken, CancellationToken cancellationToken)
     {
-        using var request = new HttpRequestMessage(HttpMethod.Get, new Uri(new Uri(_options.ApiBaseUrl), "me"));
+        using var request = new HttpRequestMessage(HttpMethod.Get, BuildApiUri("me"));
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
         using var response = await httpClient.SendAsync(request, cancellationToken);
@@ -65,7 +66,7 @@ public sealed class SpotifyApiClient(HttpClient httpClient, IOptions<SpotifyOpti
 
     public async Task<SpotifyTrackApiResponse> GetTrackAsync(string trackId, string accessToken, CancellationToken cancellationToken)
     {
-        using var request = new HttpRequestMessage(HttpMethod.Get, new Uri(new Uri(_options.ApiBaseUrl), $"tracks/{trackId}"));
+        using var request = new HttpRequestMessage(HttpMethod.Get, BuildApiUri($"tracks/{trackId}"));
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
         using var response = await httpClient.SendAsync(request, cancellationToken);
@@ -81,6 +82,76 @@ public sealed class SpotifyApiClient(HttpClient httpClient, IOptions<SpotifyOpti
         }
 
         return await ReadResponseAsync<SpotifyTrackApiResponse>(response, "spotify_track_unavailable", HttpStatusCode.BadRequest, cancellationToken);
+    }
+
+    public async Task<SpotifyArtistApiResponse> GetArtistAsync(string artistId, string accessToken, CancellationToken cancellationToken)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get, BuildApiUri($"artists/{artistId}"));
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+        using var response = await httpClient.SendAsync(request, cancellationToken);
+
+        if (response.StatusCode == HttpStatusCode.NotFound)
+        {
+            throw new IntegrationException("spotify_artist_not_found", "The Spotify artist could not be found.", 404);
+        }
+
+        return await ReadResponseAsync<SpotifyArtistApiResponse>(response, "spotify_artist_unavailable", HttpStatusCode.BadRequest, cancellationToken);
+    }
+
+    public async Task<SpotifyPlaylistApiResponse> GetPlaylistAsync(string playlistId, string accessToken, CancellationToken cancellationToken)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get, BuildApiUri($"playlists/{playlistId}"));
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+        using var response = await httpClient.SendAsync(request, cancellationToken);
+
+        if (response.StatusCode == HttpStatusCode.NotFound)
+        {
+            throw new IntegrationException("spotify_playlist_not_found", "The Spotify playlist could not be found.", 404);
+        }
+
+        if (response.StatusCode == HttpStatusCode.Forbidden)
+        {
+            throw new IntegrationException("spotify_playlist_unavailable", "The Spotify playlist is private or unavailable for this account.", 403);
+        }
+
+        return await ReadResponseAsync<SpotifyPlaylistApiResponse>(response, "spotify_playlist_unavailable", HttpStatusCode.BadRequest, cancellationToken);
+    }
+
+    public async Task<SpotifyPagingResponse<SpotifyTrackApiResponse>> GetCurrentUserTopTracksAsync(string accessToken, int limit, CancellationToken cancellationToken)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get, BuildApiUri($"me/top/tracks?limit={limit}"));
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+        using var response = await httpClient.SendAsync(request, cancellationToken);
+
+        if (response.StatusCode == HttpStatusCode.Forbidden)
+        {
+            throw new IntegrationException("spotify_scope_missing", "The linked Spotify account is missing the required scope for top tracks.", 403);
+        }
+
+        return await ReadResponseAsync<SpotifyPagingResponse<SpotifyTrackApiResponse>>(response, "spotify_top_tracks_unavailable", HttpStatusCode.BadGateway, cancellationToken);
+    }
+
+    public async Task<SpotifyPagingResponse<SpotifyArtistApiResponse>> GetCurrentUserTopArtistsAsync(string accessToken, int limit, CancellationToken cancellationToken)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get, BuildApiUri($"me/top/artists?limit={limit}"));
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+        using var response = await httpClient.SendAsync(request, cancellationToken);
+
+        if (response.StatusCode == HttpStatusCode.Forbidden)
+        {
+            throw new IntegrationException("spotify_scope_missing", "The linked Spotify account is missing the required scope for top artists.", 403);
+        }
+
+        return await ReadResponseAsync<SpotifyPagingResponse<SpotifyArtistApiResponse>>(response, "spotify_top_artists_unavailable", HttpStatusCode.BadGateway, cancellationToken);
+    }
+
+    private Uri BuildApiUri(string relativePath)
+    {
+        return new Uri(new Uri(_options.ApiBaseUrl), relativePath);
     }
 
     private static async Task<SpotifyTokenResponse> ReadTokenResponseAsync(HttpResponseMessage response, CancellationToken cancellationToken)

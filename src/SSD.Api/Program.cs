@@ -259,6 +259,45 @@ spotifyGroup.MapPost("/resolve-track", async (
     return Results.Ok(result);
 });
 
+spotifyGroup.MapPost("/resolve-artist", async (
+    SpotifyResolveArtistRequest request,
+    ISpotifyService spotifyService,
+    HttpContext httpContext,
+    CancellationToken cancellationToken) =>
+{
+    if (string.IsNullOrWhiteSpace(request.Url))
+    {
+        return Results.BadRequest(new ApiErrorResponse(
+            "validation_error",
+            "The Spotify artist request was invalid.",
+            ["Spotify artist URL is required."],
+            httpContext.TraceIdentifier));
+    }
+
+    var result = await spotifyService.ResolveArtistAsync(request.Url, cancellationToken);
+    return Results.Ok(result);
+});
+
+spotifyGroup.MapPost("/resolve-playlist", async (
+    SpotifyResolvePlaylistRequest request,
+    ClaimsPrincipal user,
+    ISpotifyService spotifyService,
+    HttpContext httpContext,
+    CancellationToken cancellationToken) =>
+{
+    if (string.IsNullOrWhiteSpace(request.Url))
+    {
+        return Results.BadRequest(new ApiErrorResponse(
+            "validation_error",
+            "The Spotify playlist request was invalid.",
+            ["Spotify playlist URL is required."],
+            httpContext.TraceIdentifier));
+    }
+
+    var result = await spotifyService.ResolvePlaylistAsync(user.GetUserId(), request.Url, cancellationToken);
+    return Results.Ok(result);
+});
+
 spotifyGroup.MapGet("/link/start", async (
     ClaimsPrincipal user,
     ISpotifyService spotifyService,
@@ -298,6 +337,22 @@ spotifyGroup.MapGet("/me", async (
     }
 
     var result = await spotifyService.GetLinkedAccountAsync(userId.Value, cancellationToken);
+    return Results.Ok(result);
+}).RequireAuthorization();
+
+spotifyGroup.MapGet("/recommendation-context", async (
+    ClaimsPrincipal user,
+    string? mood,
+    ISpotifyService spotifyService,
+    CancellationToken cancellationToken) =>
+{
+    var userId = user.GetUserId();
+    if (userId is null)
+    {
+        return Results.Unauthorized();
+    }
+
+    var result = await spotifyService.GetRecommendationContextAsync(userId.Value, mood, cancellationToken);
     return Results.Ok(result);
 }).RequireAuthorization();
 

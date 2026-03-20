@@ -43,7 +43,7 @@ public sealed class TestAuthWebApplicationFactory : WebApplicationFactory<Progra
                 ["Providers:Spotify:ClientId"] = "spotify-client-id",
                 ["Providers:Spotify:ClientSecret"] = "spotify-client-secret",
                 ["Providers:Spotify:RedirectUri"] = "https://localhost/api/spotify/link/callback",
-                ["Providers:Spotify:Scopes"] = "user-read-email user-read-private"
+                ["Providers:Spotify:Scopes"] = "user-read-email user-read-private user-top-read"
             });
         });
 
