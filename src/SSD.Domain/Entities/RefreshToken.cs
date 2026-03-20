@@ -46,4 +46,33 @@ public sealed class RefreshToken : AuditableEntity
     public string? RevocationReason { get; private set; }
 
     public User? User { get; private set; }
+
+    public bool IsActive(DateTimeOffset nowUtc) => RevokedUtc is null && ExpiresUtc > nowUtc;
+
+    public void AttachSessionMetadata(string? deviceName, string? userAgent, string? createdByIp)
+    {
+        DeviceName = deviceName?.Trim() ?? string.Empty;
+        UserAgent = userAgent?.Trim() ?? string.Empty;
+        CreatedByIp = createdByIp?.Trim() ?? string.Empty;
+        Touch();
+    }
+
+    public void MarkUsed(DateTimeOffset? lastUsedUtc = null)
+    {
+        LastUsedUtc = lastUsedUtc ?? DateTimeOffset.UtcNow;
+        Touch(LastUsedUtc);
+    }
+
+    public void Revoke(
+        string? revokedByIp,
+        string? reason,
+        string? replacedByTokenHash = null,
+        DateTimeOffset? revokedUtc = null)
+    {
+        RevokedUtc = revokedUtc ?? DateTimeOffset.UtcNow;
+        RevokedByIp = revokedByIp?.Trim();
+        RevocationReason = reason?.Trim();
+        ReplacedByTokenHash = replacedByTokenHash?.Trim();
+        Touch(RevokedUtc);
+    }
 }

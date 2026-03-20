@@ -22,6 +22,7 @@ public partial class InitialDomainModel : Migration
                 password_hash = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
                 password_hash_algorithm = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                 status = table.Column<int>(type: "integer", nullable: false),
+                role = table.Column<int>(type: "integer", nullable: false),
                 email_confirmed_utc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                 last_login_utc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                 created_utc = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),

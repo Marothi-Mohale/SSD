@@ -1,12 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="../SSD.Domain/SSD.Domain.csproj" SkipGetTargetFrameworkProperties="true" />
+    <ProjectReference Include="../SSD.Domain/SSD.Domain.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-    <DisableTransitiveProjectReferences>true</DisableTransitiveProjectReferences>
   </PropertyGroup>
 
 </Project>

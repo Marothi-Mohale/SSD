@@ -53,6 +53,7 @@ public sealed class SsdDbContext(DbContextOptions<SsdDbContext> options) : DbCon
         user.Property(x => x.DisplayName).HasMaxLength(120);
         user.Property(x => x.PasswordHash).HasMaxLength(512);
         user.Property(x => x.PasswordHashAlgorithm).HasMaxLength(64);
+        user.Property(x => x.Role);
         user.Property(x => x.CreatedUtc).HasColumnType("timestamp with time zone");
         user.Property(x => x.UpdatedUtc).HasColumnType("timestamp with time zone");
         user.Property(x => x.EmailConfirmedUtc).HasColumnType("timestamp with time zone");
