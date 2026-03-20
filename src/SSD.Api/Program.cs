@@ -100,6 +100,8 @@ app.UseExceptionHandler(handlerApp =>
             correlationId));
     });
 });
+app.UseDefaultFiles();
+app.UseStaticFiles();
 app.UseHttpsRedirection();
 app.UseRateLimiter();
 app.UseAuthentication();
@@ -114,6 +116,8 @@ app.MapGet("/", () => Results.Ok(new
     version = "v1",
     environment = app.Environment.EnvironmentName
 }));
+
+app.MapGet("/preview", () => Results.Redirect("/preview/index.html"));
 
 app.MapGet("/api/moods", () => Results.Ok(Enum.GetNames<SSD.Domain.Enums.MoodCategory>()));
 

@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SSD Preview</title>
+  <style>
+    :root {
+      --bg: #f5efe2;
+      --bg-accent: #efe5d3;
+      --surface: rgba(255, 252, 246, 0.84);
+      --surface-strong: #fffaf1;
+      --text: #18312e;
+      --muted: #516764;
+      --primary: #1f5e5b;
+      --primary-strong: #143f3d;
+      --secondary: #d66e3f;
+      --border: rgba(24, 49, 46, 0.1);
+      --shadow: 0 20px 60px rgba(31, 94, 91, 0.14);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", "SF Pro Text", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(214, 110, 63, 0.18), transparent 26rem),
+        radial-gradient(circle at top right, rgba(31, 94, 91, 0.16), transparent 24rem),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg-accent) 100%);
+    }
+
+    .shell {
+      width: min(1100px, calc(100vw - 2rem));
+      margin: 0 auto;
+      padding: 2rem 0 4rem;
+    }
+
+    .hero {
+      padding: 1.5rem 0 1rem;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      gap: 0.5rem;
+      align-items: center;
+      padding: 0.45rem 0.8rem;
+      border-radius: 999px;
+      background: rgba(255, 250, 241, 0.72);
+      border: 1px solid rgba(24, 49, 46, 0.08);
+      color: var(--muted);
+      font-size: 0.88rem;
+      letter-spacing: 0.02em;
+    }
+
+    h1 {
+      margin: 1rem 0 0.5rem;
+      font-size: clamp(2.4rem, 7vw, 4.75rem);
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+    }
+
+    .hero p {
+      max-width: 46rem;
+      margin: 0;
+      font-size: 1.05rem;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+
+    .layout {
+      display: grid;
+      gap: 1.25rem;
+      grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
+      align-items: start;
+      margin-top: 1.5rem;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      border-radius: var(--radius-xl);
+      padding: 1.35rem;
+    }
+
+    .panel h2 {
+      margin: 0 0 0.25rem;
+      font-size: 1.35rem;
+    }
+
+    .panel .subcopy {
+      margin: 0 0 1rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .field {
+      display: grid;
+      gap: 0.45rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .field label,
+    .toggle-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    select, input[type="text"] {
+      width: 100%;
+      border: 1px solid rgba(24, 49, 46, 0.12);
+      border-radius: 14px;
+      padding: 0.85rem 0.95rem;
+      background: var(--surface-strong);
+      color: var(--text);
+      font: inherit;
+    }
+
+    .checks {
+      display: grid;
+      gap: 0.75rem;
+      margin: 1rem 0 1.1rem;
+    }
+
+    .check-row {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      padding: 0.8rem 0.9rem;
+      background: rgba(255, 250, 241, 0.86);
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(24, 49, 46, 0.08);
+    }
+
+    input[type="checkbox"] {
+      width: 1.1rem;
+      height: 1.1rem;
+      accent-color: var(--primary);
+    }
+
+    button {
+      width: 100%;
+      border: 0;
+      border-radius: 16px;
+      padding: 1rem 1.15rem;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-strong) 100%);
+      color: white;
+      font: inherit;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      transition: transform 120ms ease, opacity 120ms ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:disabled { opacity: 0.65; cursor: progress; transform: none; }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: end;
+      margin-bottom: 1rem;
+    }
+
+    .results-header p {
+      margin: 0.35rem 0 0;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    .message {
+      margin-bottom: 1rem;
+      padding: 0.9rem 1rem;
+      border-radius: 14px;
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    .message.error {
+      background: rgba(180, 44, 44, 0.08);
+      color: #7f1d1d;
+      border: 1px solid rgba(180, 44, 44, 0.14);
+    }
+
+    .cards {
+      display: grid;
+      gap: 0.95rem;
+    }
+
+    .card {
+      background: rgba(255, 250, 241, 0.92);
+      border: 1px solid rgba(24, 49, 46, 0.08);
+      border-radius: var(--radius-lg);
+      padding: 1rem;
+      transform: translateY(12px);
+      opacity: 0;
+      animation: rise 420ms ease forwards;
+    }
+
+    .card:nth-child(2) { animation-delay: 60ms; }
+    .card:nth-child(3) { animation-delay: 120ms; }
+    .card:nth-child(4) { animation-delay: 180ms; }
+
+    .meta {
+      display: inline-flex;
+      gap: 0.55rem;
+      align-items: center;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .kind {
+      background: rgba(31, 94, 91, 0.12);
+      color: var(--primary);
+      border-radius: 999px;
+      padding: 0.26rem 0.6rem;
+      font-weight: 700;
+    }
+
+    .card h3 {
+      margin: 0 0 0.35rem;
+      font-size: 1.18rem;
+    }
+
+    .card .creator {
+      margin: 0 0 0.55rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .card .description {
+      margin: 0 0 0.7rem;
+      line-height: 1.55;
+    }
+
+    .why {
+      padding: 0.8rem 0.9rem;
+      border-radius: 14px;
+      background: rgba(214, 110, 63, 0.09);
+      color: #8a4a22;
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    .why strong {
+      color: var(--secondary);
+      display: inline-block;
+      margin-right: 0.35rem;
+    }
+
+    .empty {
+      padding: 2rem 1rem;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed rgba(24, 49, 46, 0.14);
+      border-radius: var(--radius-lg);
+      background: rgba(255, 250, 241, 0.55);
+    }
+
+    .footer-note {
+      margin-top: 1rem;
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+
+    @keyframes rise {
+      from { transform: translateY(12px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @media (max-width: 880px) {
+      .layout { grid-template-columns: 1fr; }
+      .shell { width: min(100vw - 1rem, 42rem); }
+      body { padding-bottom: 2rem; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div class="eyebrow">SSD Preview <span>Browser Shell</span></div>
+      <h1>Special Sound &amp; Screen Discovery</h1>
+      <p>Pick a mood, adjust the vibe, and preview the same recommendation flow the MAUI app is shaping around. This page is temporary, but it uses the real SSD API.</p>
+    </section>
+
+    <section class="layout">
+      <form id="discover-form" class="panel">
+        <h2>Mood Setup</h2>
+        <p class="subcopy">This mirrors the current MAUI shell so you can try the experience in a browser from your laptop or your Galaxy A12.</p>
+
+        <div class="field">
+          <label for="mood">Mood</label>
+          <select id="mood" name="mood"></select>
+        </div>
+
+        <div class="field">
+          <label for="energy">Energy</label>
+          <input id="energy" name="energy" type="text" placeholder="low, medium, high">
+        </div>
+
+        <div class="field">
+          <label for="timeOfDay">Time Of Day</label>
+          <input id="timeOfDay" name="timeOfDay" type="text" placeholder="morning, evening, late night">
+        </div>
+
+        <div class="checks">
+          <label class="check-row toggle-label"><input id="includeMusic" type="checkbox" checked> Include music</label>
+          <label class="check-row toggle-label"><input id="includeMovies" type="checkbox" checked> Include movies</label>
+          <label class="check-row toggle-label"><input id="familyFriendlyOnly" type="checkbox"> Family friendly only</label>
+        </div>
+
+        <button id="discover-button" type="submit">Discover</button>
+        <div class="footer-note">Tip: once this runs on your laptop, open <code>/preview</code> from your phone on the same Wi‑Fi network.</div>
+      </form>
+
+      <section class="panel">
+        <div class="results-header">
+          <div>
+            <h2>Recommended For You</h2>
+            <p id="results-subtitle">Using the same SSD recommendation endpoint the app will call.</p>
+          </div>
+        </div>
+
+        <div id="message" hidden></div>
+        <div id="cards" class="cards"></div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const moodSelect = document.getElementById("mood");
+    const discoverForm = document.getElementById("discover-form");
+    const discoverButton = document.getElementById("discover-button");
+    const message = document.getElementById("message");
+    const cards = document.getElementById("cards");
+    const resultsSubtitle = document.getElementById("results-subtitle");
+
+    const starterCards = [
+      {
+        kind: "Music",
+        title: "Weightless",
+        creator: "Marconi Union",
+        description: "A calm, spacious ambient recommendation for slowing the room down.",
+        why: "Matches a calm mood with gentle pacing and low sensory pressure.",
+        genre: "Ambient",
+        matchScore: "0.93"
+      },
+      {
+        kind: "Movie",
+        title: "Paddington 2",
+        creator: "Paul King",
+        description: "A warm, bright comfort-watch that works especially well for cozy sessions.",
+        why: "Matches a cozy mood through warmth, humor, and family-friendly tone.",
+        genre: "Family",
+        matchScore: "0.90"
+      }
+    ];
+
+    function setMessage(text, isError = false) {
+      if (!text) {
+        message.hidden = true;
+        message.textContent = "";
+        message.className = "";
+        return;
+      }
+
+      message.hidden = false;
+      message.textContent = text;
+      message.className = `message${isError ? " error" : ""}`;
+    }
+
+    function renderCards(items) {
+      cards.innerHTML = "";
+
+      if (!items.length) {
+        cards.innerHTML = '<div class="empty">No recommendations yet. Pick a mood and hit Discover.</div>';
+        return;
+      }
+
+      for (const item of items) {
+        const card = document.createElement("article");
+        card.className = "card";
+        card.innerHTML = `
+          <div class="meta">
+            <span class="kind">${item.kind}</span>
+            <span>${item.genre ?? "Mood fit"}</span>
+            <span>Match ${item.matchScore ?? ""}</span>
+          </div>
+          <h3>${item.title}</h3>
+          <p class="creator">${item.creator}</p>
+          <p class="description">${item.description}</p>
+          <div class="why"><strong>Why it matches:</strong>${item.why}</div>
+        `;
+        cards.appendChild(card);
+      }
+    }
+
+    async function loadMoods() {
+      const response = await fetch("/api/moods");
+      const moods = await response.json();
+      moodSelect.innerHTML = "";
+
+      for (const mood of moods) {
+        const option = document.createElement("option");
+        option.value = mood;
+        option.textContent = mood;
+        moodSelect.appendChild(option);
+      }
+    }
+
+    async function discover(event) {
+      event.preventDefault();
+      setMessage("");
+      discoverButton.disabled = true;
+      discoverButton.textContent = "Discovering...";
+
+      const payload = {
+        mood: moodSelect.value,
+        energy: document.getElementById("energy").value || null,
+        timeOfDay: document.getElementById("timeOfDay").value || null,
+        familyFriendlyOnly: document.getElementById("familyFriendlyOnly").checked,
+        includeMusic: document.getElementById("includeMusic").checked,
+        includeMovies: document.getElementById("includeMovies").checked
+      };
+
+      try {
+        const response = await fetch("/api/recommendations/discover", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          setMessage((data.errors && data.errors.join(" ")) || data.message || "Recommendation request failed.", true);
+          return;
+        }
+
+        resultsSubtitle.textContent = data.message || "Fresh SSD recommendations";
+        renderCards((data.recommendations || []).map(item => ({
+          kind: item.kind,
+          title: item.title,
+          creator: item.creator,
+          description: item.description,
+          why: item.whyItMatches?.summary || "Matched by the current SSD mood rules.",
+          genre: item.genre,
+          matchScore: Number(item.matchScore).toFixed(2)
+        })));
+      } catch (error) {
+        setMessage("The preview could not reach the SSD API. Start the API locally and try again.", true);
+      } finally {
+        discoverButton.disabled = false;
+        discoverButton.textContent = "Discover";
+      }
+    }
+
+    discoverForm.addEventListener("submit", discover);
+    renderCards(starterCards);
+    loadMoods().catch(() => {
+      setMessage("Could not load moods from the SSD API. Start the API locally to use the preview.", true);
+    });
+  </script>
+</body>
+</html>

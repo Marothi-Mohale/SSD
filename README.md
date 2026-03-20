@@ -88,6 +88,49 @@ The repo also disables build-time NuGet vulnerability auditing during normal res
 HOME=/workspaces/SSD/.home DOTNET_CLI_HOME=/workspaces/SSD/.dotnet-home NUGET_PACKAGES=/workspaces/SSD/.nuget/packages dotnet run --project src/SSD.Api/SSD.Api.csproj
 ```
 
+5. Open the temporary browser preview:
+
+```text
+http://localhost:5000/preview
+```
+
+If you run the API over plain HTTP on your laptop, you can also open that preview page from your phone on the same Wi-Fi network by using your laptop's LAN IP, for example:
+
+```text
+http://192.168.1.25:5080/preview
+```
+
+## Galaxy A12 Setup
+
+You can run the real MAUI Android app on a Galaxy A12 from a local Windows or macOS machine with Android tooling installed.
+
+1. Install the .NET SDK version pinned by [global.json](/workspaces/SSD/global.json).
+2. Install the MAUI Android workload:
+
+```bash
+dotnet workload restore
+```
+
+3. On the Galaxy A12:
+   Enable Developer Options.
+   Enable USB debugging.
+   Connect the phone by USB and approve the debugging prompt.
+
+4. Verify the device is visible:
+
+```bash
+adb devices
+```
+
+5. Build and run SSD on the phone:
+
+```bash
+dotnet build src/SSD.Mobile/SSD.Mobile.csproj -f net10.0-android -p:EnableMauiTargets=true
+dotnet build src/SSD.Mobile/SSD.Mobile.csproj -f net10.0-android -t:Run -p:EnableMauiTargets=true
+```
+
+If you prefer Visual Studio, open [SSD.sln](/workspaces/SSD/SSD.sln), choose the `SSD.Mobile` Android target, select the connected Galaxy A12, and run.
+
 ## What Is Included
 
 - An ASP.NET Core Web API host with auth, recommendation, and Spotify endpoints
