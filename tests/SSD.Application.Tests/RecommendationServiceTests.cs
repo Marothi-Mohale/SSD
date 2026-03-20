@@ -10,12 +10,12 @@ namespace SSD.Application.Tests;
 public sealed class RecommendationServiceTests
 {
     [Fact]
-    public async Task DiscoverAsync_ReturnsRecommendationsOrderedByScore()
+    public async Task DiscoverAsyncReturnsRecommendationsOrderedByScore()
     {
         var service = new RecommendationService([new FakeProvider()]);
 
         var response = await service.DiscoverAsync(new DiscoverRecommendationsRequest(
-            MoodCategory.Calm,
+            MoodCategory.Relaxed,
             "low",
             "evening",
             false,

@@ -12,7 +12,7 @@ public sealed class RecommendationSession : AggregateRoot
     public RecommendationSession()
     {
         CorrelationId = string.Empty;
-        Selection = new MoodSelection(MoodCategory.Calm, null, null, false, true, true);
+        Selection = new MoodSelection(MoodCategory.Relaxed, null, null, false, true, true);
         Status = RecommendationSessionStatus.Pending;
     }
 

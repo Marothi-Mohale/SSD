@@ -10,7 +10,7 @@ public sealed class DiscoverStateTests
     {
         var state = new DiscoverState();
 
-        Assert.Equal(MoodCategory.Calm, state.SelectedMood);
+        Assert.Equal(MoodCategory.Relaxed, state.SelectedMood);
         Assert.True(state.IncludeMusic);
         Assert.True(state.IncludeMovies);
         Assert.False(state.FamilyFriendlyOnly);

@@ -1,3 +1,4 @@
+#pragma warning disable CA1848
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SSD.Application.Abstractions;
@@ -184,3 +185,4 @@ public sealed class AuthService(
                 user.Role.ToString()));
     }
 }
+#pragma warning restore CA1848

@@ -1,114 +1,274 @@
 using SSD.Application.Abstractions;
+using SSD.Application.Models;
 using SSD.Domain.Entities;
 using SSD.Domain.Enums;
+using SSD.Domain.Moods;
 using SSD.Domain.ValueObjects;
 
 namespace SSD.Infrastructure.Recommendations;
 
-public sealed class SeedRecommendationProvider : IRecommendationProvider
+public sealed class SeedRecommendationProvider(
+    IMoodRuleCatalog moodRuleCatalog,
+    IMoodRuleScorer moodRuleScorer) : IRecommendationProvider
 {
+    private const decimal MinimumDisplayScore = 0.32m;
+
     private static readonly IReadOnlyList<RecommendationSeed> Seeds =
     [
         new(
-            "music-weightless",
+            "music-happy-happy",
             RecommendationKind.Music,
-            MoodCategory.Calm,
-            "Weightless",
-            "Marconi Union",
-            "Ambient",
+            "Happy",
+            "Pharrell Williams",
             "Spotify",
-            "Gentle ambient textures for slowing down and decompressing.",
-            0.96m,
-            ["Low intensity soundscape", "Consistent pacing", "Excellent fit for calm moods"]),
+            "Bright pop with an easy groove and a celebratory hook.",
+            new RecommendationCandidateProfile(["Pop", "Dance-Pop"], ["uplifting", "bright", "groovy", "warm"], EnergyLevel.High, TimeOfDaySegment.Morning, true)),
         new(
-            "music-midnight-city",
+            "movie-happy-sing-street",
+            RecommendationKind.Movie,
+            "Sing Street",
+            "John Carney",
+            "TMDb",
+            "A warm, funny coming-of-age story with music, optimism, and emotional lift.",
+            new RecommendationCandidateProfile(["Comedy", "Coming-of-Age", "Music"], ["uplifting", "feel-good", "warm"], EnergyLevel.Medium, TimeOfDaySegment.Evening, true)),
+        new(
+            "music-sad-skinny-love",
             RecommendationKind.Music,
-            MoodCategory.Energetic,
-            "Midnight City",
-            "M83",
-            "Synth-pop",
+            "Skinny Love",
+            "Bon Iver",
             "Spotify",
-            "A high-energy synth anthem that gives the mood immediate momentum.",
-            0.95m,
-            ["Fast tempo", "Bright synth layers", "Late-evening energy fit"]),
+            "Tender indie-folk that validates sadness without becoming melodramatic.",
+            new RecommendationCandidateProfile(["Indie-Folk", "Singer-Songwriter"], ["melancholic", "reflective", "tender"], EnergyLevel.Low, TimeOfDaySegment.Night, false)),
         new(
-            "music-lofi-session",
+            "movie-sad-manchester-by-the-sea",
+            RecommendationKind.Movie,
+            "Manchester by the Sea",
+            "Kenneth Lonergan",
+            "TMDb",
+            "A reflective drama grounded in grief, empathy, and quiet emotional realism.",
+            new RecommendationCandidateProfile(["Drama", "Character Study"], ["empathetic", "reflective", "quiet"], EnergyLevel.Low, TimeOfDaySegment.Night, false)),
+        new(
+            "music-romantic-at-last",
             RecommendationKind.Music,
-            MoodCategory.Focused,
+            "At Last",
+            "Etta James",
+            "Spotify",
+            "Soulful and intimate, with timeless romantic warmth.",
+            new RecommendationCandidateProfile(["Soul", "Jazz"], ["romantic", "intimate", "warm"], EnergyLevel.Low, TimeOfDaySegment.Evening, false)),
+        new(
+            "movie-romantic-before-sunrise",
+            RecommendationKind.Movie,
+            "Before Sunrise",
+            "Richard Linklater",
+            "TMDb",
+            "Chemistry-driven romance built on conversation, intimacy, and tenderness.",
+            new RecommendationCandidateProfile(["Romance", "Drama"], ["romantic", "chemistry", "tender"], EnergyLevel.Low, TimeOfDaySegment.Evening, false)),
+        new(
+            "music-angry-killing-in-the-name",
+            RecommendationKind.Music,
+            "Killing in the Name",
+            "Rage Against the Machine",
+            "Spotify",
+            "Aggressive and cathartic with direct release-valve energy.",
+            new RecommendationCandidateProfile(["Rock", "Metal"], ["cathartic", "aggressive", "driving"], EnergyLevel.High, TimeOfDaySegment.Afternoon, false)),
+        new(
+            "movie-angry-mad-max-fury-road",
+            RecommendationKind.Movie,
+            "Mad Max: Fury Road",
+            "George Miller",
+            "TMDb",
+            "A propulsive action film that channels anger into adrenaline and motion.",
+            new RecommendationCandidateProfile(["Action", "Thriller"], ["adrenaline", "defiant", "fast"], EnergyLevel.High, TimeOfDaySegment.Afternoon, false)),
+        new(
+            "music-focused-lofi-session",
+            RecommendationKind.Music,
             "Lofi Study Session",
             "Various Artists",
-            "Lo-fi",
             "Spotify",
             "Steady instrumental beats designed to help attention settle.",
-            0.94m,
-            ["Low distraction", "Predictable rhythm", "Strong focus signal"]),
+            new RecommendationCandidateProfile(["Lo-fi", "Ambient"], ["instrumental", "steady", "minimal", "focus-friendly"], EnergyLevel.Low, TimeOfDaySegment.Morning, true)),
         new(
-            "music-time",
-            RecommendationKind.Music,
-            MoodCategory.Nostalgic,
-            "Time",
-            "Pink Floyd",
-            "Progressive Rock",
-            "Spotify",
-            "A reflective classic for users leaning toward memory and introspection.",
-            0.92m,
-            ["Classic sound", "Reflective tone", "Nostalgia-heavy mood fit"]),
-        new(
-            "movie-walter-mitty",
+            "movie-focused-arrival",
             RecommendationKind.Movie,
-            MoodCategory.Adventurous,
-            "The Secret Life of Walter Mitty",
-            "Ben Stiller",
-            "Adventure / Comedy",
-            "TMDb",
-            "A hopeful travel-forward movie for curiosity, movement, and discovery.",
-            0.95m,
-            ["Adventure-first story", "Optimistic tone", "Matches exploration"]),
-        new(
-            "movie-paddington-2",
-            RecommendationKind.Movie,
-            MoodCategory.Cozy,
-            "Paddington 2",
-            "Paul King",
-            "Family / Comedy",
-            "TMDb",
-            "A warm, funny comfort-watch with strong family-friendly appeal.",
-            0.97m,
-            ["Gentle humor", "Warm emotional tone", "Family friendly"]),
-        new(
-            "movie-arrival",
-            RecommendationKind.Movie,
-            MoodCategory.Focused,
             "Arrival",
             "Denis Villeneuve",
-            "Sci-Fi / Drama",
             "TMDb",
-            "A thoughtful and immersive film for concentrated, cerebral viewing.",
-            0.91m,
-            ["Slow-burn pacing", "Thoughtful narrative", "Focus-friendly atmosphere"]),
+            "A measured, immersive science-fiction drama that rewards concentration.",
+            new RecommendationCandidateProfile(["Sci-Fi", "Drama", "Mystery"], ["thoughtful", "immersive", "measured"], EnergyLevel.Low, TimeOfDaySegment.Morning, false)),
         new(
-            "movie-about-time",
+            "music-gym-lose-yourself",
+            RecommendationKind.Music,
+            "Lose Yourself",
+            "Eminem",
+            "Spotify",
+            "High-drive motivation with confident, locked-in momentum.",
+            new RecommendationCandidateProfile(["Hip-Hop"], ["motivational", "driving", "confident", "high-energy"], EnergyLevel.High, TimeOfDaySegment.Morning, false)),
+        new(
+            "movie-gym-creed",
             RecommendationKind.Movie,
-            MoodCategory.Nostalgic,
+            "Creed",
+            "Ryan Coogler",
+            "TMDb",
+            "Underdog sports drama with strong training and perseverance energy.",
+            new RecommendationCandidateProfile(["Sports Drama", "Drama"], ["motivational", "competitive", "underdog"], EnergyLevel.High, TimeOfDaySegment.Morning, false)),
+        new(
+            "music-relaxed-weightless",
+            RecommendationKind.Music,
+            "Weightless",
+            "Marconi Union",
+            "Spotify",
+            "Gentle ambient textures for slowing down and decompressing.",
+            new RecommendationCandidateProfile(["Ambient", "Chillout"], ["calming", "soft", "spacious"], EnergyLevel.Low, TimeOfDaySegment.Evening, true)),
+        new(
+            "movie-relaxed-chef",
+            RecommendationKind.Movie,
+            "Chef",
+            "Jon Favreau",
+            "TMDb",
+            "Comforting, warm, and low-friction with easy feel-good momentum.",
+            new RecommendationCandidateProfile(["Comedy", "Food Film", "Slice-of-Life"], ["comforting", "warm", "gentle"], EnergyLevel.Low, TimeOfDaySegment.Evening, true)),
+        new(
+            "music-nostalgic-dreams",
+            RecommendationKind.Music,
+            "Dreams",
+            "Fleetwood Mac",
+            "Spotify",
+            "A reflective classic with warmth, memory, and easy emotional pull.",
+            new RecommendationCandidateProfile(["Classic Rock", "Retro Pop"], ["nostalgic", "reflective", "warm"], EnergyLevel.Medium, TimeOfDaySegment.LateNight, false)),
+        new(
+            "movie-nostalgic-about-time",
+            RecommendationKind.Movie,
             "About Time",
             "Richard Curtis",
-            "Romance / Drama",
             "TMDb",
-            "A sentimental recommendation for reflective and emotionally warm moods.",
-            0.93m,
-            ["Reflective themes", "Emotional warmth", "High nostalgia fit"])
+            "Bittersweet, warm, and memory-rich without losing hope.",
+            new RecommendationCandidateProfile(["Romance", "Drama", "Coming-of-Age"], ["reflective", "bittersweet", "warm"], EnergyLevel.Low, TimeOfDaySegment.LateNight, false)),
+        new(
+            "music-lonely-liability",
+            RecommendationKind.Music,
+            "Liability",
+            "Lorde",
+            "Spotify",
+            "Sparse and intimate, like a quiet conversation with one person.",
+            new RecommendationCandidateProfile(["Indie", "Singer-Songwriter"], ["intimate", "reflective", "gentle"], EnergyLevel.Low, TimeOfDaySegment.Night, false)),
+        new(
+            "movie-lonely-her",
+            RecommendationKind.Movie,
+            "Her",
+            "Spike Jonze",
+            "TMDb",
+            "An intimate, empathetic character study about connection and isolation.",
+            new RecommendationCandidateProfile(["Drama", "Science Fiction", "Character Study"], ["empathetic", "intimate", "human"], EnergyLevel.Low, TimeOfDaySegment.Night, false)),
+        new(
+            "music-party-uptown-funk",
+            RecommendationKind.Music,
+            "Uptown Funk",
+            "Mark Ronson feat. Bruno Mars",
+            "Spotify",
+            "Immediate social energy with strong dance-floor momentum.",
+            new RecommendationCandidateProfile(["Dance-Pop", "Funk"], ["danceable", "high-energy", "social"], EnergyLevel.High, TimeOfDaySegment.Evening, true)),
+        new(
+            "movie-party-booksmart",
+            RecommendationKind.Movie,
+            "Booksmart",
+            "Olivia Wilde",
+            "TMDb",
+            "Fast, social, chaotic-fun comedy energy for party mode.",
+            new RecommendationCandidateProfile(["Comedy", "Teen Comedy"], ["chaotic-fun", "social", "fast"], EnergyLevel.High, TimeOfDaySegment.Evening, false)),
+        new(
+            "music-adventurous-on-top-of-the-world",
+            RecommendationKind.Music,
+            "On Top of the World",
+            "Imagine Dragons",
+            "Spotify",
+            "Expansive and forward-moving with travel-friendly optimism.",
+            new RecommendationCandidateProfile(["Indie Rock", "Folk Rock"], ["expansive", "cinematic", "uplifting"], EnergyLevel.Medium, TimeOfDaySegment.Afternoon, true)),
+        new(
+            "movie-adventurous-walter-mitty",
+            RecommendationKind.Movie,
+            "The Secret Life of Walter Mitty",
+            "Ben Stiller",
+            "TMDb",
+            "A hopeful travel-forward movie for curiosity, movement, and discovery.",
+            new RecommendationCandidateProfile(["Adventure", "Travel", "Comedy"], ["exploratory", "optimistic", "wanderlust"], EnergyLevel.Medium, TimeOfDaySegment.Afternoon, true)),
+        new(
+            "music-heartbroken-someone-like-you",
+            RecommendationKind.Music,
+            "Someone Like You",
+            "Adele",
+            "Spotify",
+            "Raw heartbreak with clarity, vulnerability, and emotional release.",
+            new RecommendationCandidateProfile(["Ballad", "Soul"], ["heartbreak", "raw", "vulnerable"], EnergyLevel.Low, TimeOfDaySegment.LateNight, false)),
+        new(
+            "movie-heartbroken-blue-valentine",
+            RecommendationKind.Movie,
+            "Blue Valentine",
+            "Derek Cianfrance",
+            "TMDb",
+            "A devastating romantic drama for heartbreak and emotional processing.",
+            new RecommendationCandidateProfile(["Romantic Drama", "Drama"], ["bittersweet", "devastating", "romantic"], EnergyLevel.Low, TimeOfDaySegment.LateNight, false)),
+        new(
+            "music-hopeful-unwritten",
+            RecommendationKind.Music,
+            "Unwritten",
+            "Natasha Bedingfield",
+            "Spotify",
+            "Open-hearted and resilient with clear upward emotional motion.",
+            new RecommendationCandidateProfile(["Pop", "Indie Pop"], ["hopeful", "uplifting", "resilient"], EnergyLevel.Medium, TimeOfDaySegment.Morning, true)),
+        new(
+            "movie-hopeful-pursuit-of-happyness",
+            RecommendationKind.Movie,
+            "The Pursuit of Happyness",
+            "Gabriele Muccino",
+            "TMDb",
+            "A resilient, inspiring drama rooted in effort and optimism.",
+            new RecommendationCandidateProfile(["Drama", "Biography"], ["hopeful", "resilient", "inspiring"], EnergyLevel.Medium, TimeOfDaySegment.Morning, false)),
+        new(
+            "music-rainyday-holocene",
+            RecommendationKind.Music,
+            "Holocene",
+            "Bon Iver",
+            "Spotify",
+            "Soft, atmospheric, and ideal for a slow rainy afternoon.",
+            new RecommendationCandidateProfile(["Indie Folk", "Acoustic"], ["atmospheric", "cozy", "soft"], EnergyLevel.Low, TimeOfDaySegment.Afternoon, false)),
+        new(
+            "movie-rainyday-amelie",
+            RecommendationKind.Movie,
+            "Amelie",
+            "Jean-Pierre Jeunet",
+            "TMDb",
+            "Whimsical and atmospheric with cozy inside-day energy.",
+            new RecommendationCandidateProfile(["Romance", "Comedy", "Slice-of-Life"], ["cozy", "whimsical", "atmospheric"], EnergyLevel.Low, TimeOfDaySegment.Afternoon, false)),
+        new(
+            "music-latenight-midnight-city",
+            RecommendationKind.Music,
+            "Midnight City",
+            "M83",
+            "Spotify",
+            "Nocturnal synth energy that feels made for after-hours momentum.",
+            new RecommendationCandidateProfile(["Synth-Pop", "Electronic"], ["nocturnal", "dreamy", "night-drive", "moody"], EnergyLevel.Medium, TimeOfDaySegment.LateNight, false)),
+        new(
+            "movie-latenight-drive",
+            RecommendationKind.Movie,
+            "Drive",
+            "Nicolas Winding Refn",
+            "TMDb",
+            "Stylish neo-noir mood with immersive late-night atmosphere.",
+            new RecommendationCandidateProfile(["Neo-Noir", "Thriller", "Crime"], ["moody", "stylish", "immersive"], EnergyLevel.Medium, TimeOfDaySegment.LateNight, false))
     ];
 
     public Task<IReadOnlyList<ContentRecommendation>> GetRecommendationsAsync(
         MoodSelection selection,
         CancellationToken cancellationToken = default)
     {
+        var rule = moodRuleCatalog.GetRule(selection.Mood);
+
         var recommendations = Seeds
-            .Where(seed => seed.Mood == selection.Mood)
             .Where(seed => selection.IncludeMusic || seed.Kind != RecommendationKind.Music)
             .Where(seed => selection.IncludeMovies || seed.Kind != RecommendationKind.Movie)
-            .Where(seed => !selection.FamilyFriendlyOnly || seed.Kind != RecommendationKind.Movie || seed.IsFamilyFriendly)
-            .Select(seed => seed.ToRecommendation(selection))
+            .Where(seed => !selection.FamilyFriendlyOnly || seed.Profile.IsFamilyFriendly)
+            .Select(seed => seed.ToRecommendation(moodRuleScorer.Score(selection, rule, seed.Kind, seed.Profile)))
+            .Where(recommendation => recommendation.MatchScore >= MinimumDisplayScore)
             .OrderByDescending(item => item.MatchScore)
             .ToArray();
 
@@ -118,44 +278,24 @@ public sealed class SeedRecommendationProvider : IRecommendationProvider
     private sealed record RecommendationSeed(
         string Id,
         RecommendationKind Kind,
-        MoodCategory Mood,
         string Title,
         string Creator,
-        string Genre,
         string Provider,
         string Description,
-        decimal BaseScore,
-        IReadOnlyList<string> Signals)
+        RecommendationCandidateProfile Profile)
     {
-        public bool IsFamilyFriendly => Title is "Paddington 2";
-
-        public ContentRecommendation ToRecommendation(MoodSelection selection)
+        public ContentRecommendation ToRecommendation(MoodScoreResult result)
         {
-            var whyItMatches = Signals.ToList();
-            var score = BaseScore;
-
-            if (selection.EnergyLevel.HasValue)
-            {
-                whyItMatches.Add($"Energy filter: {selection.EnergyLevel.Value}");
-            }
-
-            if (selection.TimeOfDay.HasValue)
-            {
-                whyItMatches.Add($"Time of day: {selection.TimeOfDay}");
-            }
-
             return new ContentRecommendation(
                 Id,
                 Kind,
                 Title,
                 Creator,
-                Genre,
+                Profile.Genres.Count > 0 ? Profile.Genres[0] : "Unknown",
                 Provider,
                 Description,
-                Math.Min(score, 0.99m),
-                new RecommendationReason(
-                    $"This {Kind.ToString().ToLowerInvariant()} aligns with a {selection.Mood.ToString().ToLowerInvariant()} mood.",
-                    whyItMatches));
+                result.Score,
+                new RecommendationReason(result.Summary, result.Signals));
         }
     }
 }

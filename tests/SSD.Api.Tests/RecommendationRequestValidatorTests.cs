@@ -10,7 +10,7 @@ public sealed class RecommendationRequestValidatorTests
     public void Validate_ReturnsError_WhenBothContentTypesAreDisabled()
     {
         var request = new DiscoverRecommendationsRequest(
-            MoodCategory.Calm,
+            MoodCategory.Relaxed,
             "low",
             "evening",
             false,
@@ -26,7 +26,7 @@ public sealed class RecommendationRequestValidatorTests
     public void Validate_ReturnsNoErrors_ForValidRequest()
     {
         var request = new DiscoverRecommendationsRequest(
-            MoodCategory.Cozy,
+            MoodCategory.RainyDay,
             "low",
             "night",
             true,

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="SSD.Mobile.Views.MainPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:models="clr-namespace:SSD.Mobile.Models"
+    Title="SSD">
+    <ScrollView>
+        <VerticalStackLayout Padding="24,48,24,24" Spacing="20">
+            <VerticalStackLayout Spacing="6">
+                <Label FontAttributes="Bold" FontSize="32" Text="SSD" />
+                <Label FontSize="16" Opacity="0.8" Text="Special Sound &amp; Screen Discovery" />
+            </VerticalStackLayout>
+
+            <Border BackgroundColor="{StaticResource SsdSurface}" Padding="18" StrokeShape="RoundRectangle 20">
+                <VerticalStackLayout Spacing="14">
+                    <Label FontAttributes="Bold" FontSize="20" Text="Mood Setup" />
+                    <Picker ItemsSource="{Binding Moods}" SelectedItem="{Binding SelectedMood}" Title="Mood" />
+                    <Entry Placeholder="Energy, e.g. low" Text="{Binding Energy}" />
+                    <Entry Placeholder="Time of day, e.g. evening" Text="{Binding TimeOfDay}" />
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                        <CheckBox Grid.Column="0" IsChecked="{Binding IncludeMusic}" />
+                        <Label Grid.Column="0" Margin="28,0,0,0" Text="Include music" VerticalTextAlignment="Center" />
+                        <CheckBox Grid.Column="1" IsChecked="{Binding IncludeMovies}" />
+                        <Label Grid.Column="1" Margin="28,0,0,0" Text="Include movies" VerticalTextAlignment="Center" />
+                    </Grid>
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                        <CheckBox IsChecked="{Binding FamilyFriendlyOnly}" />
+                        <Label Grid.Column="1" Text="Family friendly only" VerticalTextAlignment="Center" />
+                    </Grid>
+                    <Button
+                        BackgroundColor="{StaticResource SsdPrimary}"
+                        Clicked="OnDiscoverClicked"
+                        CornerRadius="16"
+                        Text="Discover"
+                        TextColor="White" />
+                </VerticalStackLayout>
+            </Border>
+
+            <VerticalStackLayout Spacing="12">
+                <Label FontAttributes="Bold" FontSize="22" Text="Recommended For You" />
+                <CollectionView ItemsSource="{Binding Recommendations}" SelectionMode="None">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:RecommendationCardViewModel">
+                            <Border BackgroundColor="{StaticResource SsdSurface}" Margin="0,0,0,12" Padding="18" StrokeShape="RoundRectangle 20">
+                                <VerticalStackLayout Spacing="8">
+                                    <Label FontAttributes="Bold" FontSize="18" Text="{Binding Title}" />
+                                    <Label FontSize="13" Opacity="0.75" Text="{Binding Subtitle}" />
+                                    <Label FontSize="14" Text="{Binding Description}" />
+                                    <Label FontAttributes="Italic" FontSize="13" Text="{Binding WhyItMatches}" TextColor="{StaticResource SsdSecondary}" />
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

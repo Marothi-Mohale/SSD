@@ -15,7 +15,7 @@ namespace SSD.Api.Tests;
 public sealed class TestAuthWebApplicationFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
     private DbConnection? _connection;
-    public SpotifyStubMessageHandler SpotifyHandler { get; } = new();
+    internal SpotifyStubMessageHandler SpotifyHandler { get; } = new();
 
     public Task InitializeAsync()
     {

@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
@@ -53,6 +52,8 @@ public static class DependencyInjection
         services.AddSingleton<ITokenService, JwtTokenService>();
         services.AddSingleton<SpotifyOAuthStateProtector>();
         services.AddSingleton<ISpotifyTokenProtector, SpotifyTokenProtector>();
+        services.AddSingleton<IMoodRuleCatalog, InitialMoodRuleCatalog>();
+        services.AddSingleton<IMoodRuleScorer, MoodRuleScorer>();
         services.AddScoped<IRecommendationService, RecommendationService>();
         services.AddSingleton<IRecommendationProvider, SeedRecommendationProvider>();
         return services;

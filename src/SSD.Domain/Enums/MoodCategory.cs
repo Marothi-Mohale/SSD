@@ -2,10 +2,19 @@ namespace SSD.Domain.Enums;
 
 public enum MoodCategory
 {
-    Calm,
-    Energetic,
+    Happy,
+    Sad,
+    Romantic,
+    Angry,
     Focused,
+    Gym,
+    Relaxed,
     Nostalgic,
+    Lonely,
+    Party,
     Adventurous,
-    Cozy
+    Heartbroken,
+    Hopeful,
+    RainyDay,
+    LateNight
 }

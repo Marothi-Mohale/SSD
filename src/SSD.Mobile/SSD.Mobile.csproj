@@ -1,11 +1,49 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <EnableMauiTargets Condition="'$(EnableMauiTargets)' == ''">false</EnableMauiTargets>
+    <TargetFrameworks Condition="'$(EnableMauiTargets)' != 'true'">net10.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(EnableMauiTargets)' == 'true'">net10.0;net10.0-android;net10.0-ios;net10.0-maccatalyst</TargetFrameworks>
     <RootNamespace>SSD.Mobile</RootNamespace>
     <AssemblyName>SSD.Mobile</AssemblyName>
-    <DisableTransitiveProjectReferences>true</DisableTransitiveProjectReferences>
+    <UseMaui Condition="'$(TargetFramework)' != '' and '$(TargetFramework)' != 'net10.0'">true</UseMaui>
+    <SingleProject Condition="'$(TargetFramework)' != '' and '$(TargetFramework)' != 'net10.0'">true</SingleProject>
+    <OutputType Condition="'$(TargetFramework)' != '' and '$(TargetFramework)' != 'net10.0'">Exe</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <SupportedOSPlatformVersion Condition="'$(TargetFramework)' == 'net10.0-android'">24.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion Condition="'$(TargetFramework)' == 'net10.0-ios'">15.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion Condition="'$(TargetFramework)' == 'net10.0-maccatalyst'">15.0</SupportedOSPlatformVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../SSD.Domain/SSD.Domain.csproj" SkipGetTargetFrameworkProperties="true" />
+    <ProjectReference Include="../SSD.Domain/SSD.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+    <Compile Remove="App.xaml.cs" />
+    <Compile Remove="AppShell.xaml.cs" />
+    <Compile Remove="MauiProgram.cs" />
+    <Compile Remove="Views\MainPage.xaml.cs" />
+    <EmbeddedResource Remove="App.xaml" />
+    <EmbeddedResource Remove="AppShell.xaml" />
+    <EmbeddedResource Remove="Views\MainPage.xaml" />
+    <None Include="App.xaml" />
+    <None Include="AppShell.xaml" />
+    <None Include="Views\MainPage.xaml" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' != 'net10.0'">
+    <MauiXaml Include="App.xaml" />
+    <MauiXaml Include="AppShell.xaml" />
+    <MauiXaml Include="Views/MainPage.xaml" />
+    <Compile Update="App.xaml.cs" DependentUpon="App.xaml" />
+    <Compile Update="AppShell.xaml.cs" DependentUpon="AppShell.xaml" />
+    <Compile Update="Views/MainPage.xaml.cs" DependentUpon="Views/MainPage.xaml" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' != 'net10.0'">
+    <MauiImage Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#1F5E5B" />
+    <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#F6F3EA" BaseSize="128,128" />
+    <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 </Project>

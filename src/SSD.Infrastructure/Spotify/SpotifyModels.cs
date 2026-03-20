@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace SSD.Infrastructure.Spotify;
 
-internal sealed class SpotifyTokenResponse
+public sealed class SpotifyTokenResponse
 {
     [JsonPropertyName("access_token")]
     public string AccessToken { get; set; } = string.Empty;
@@ -20,7 +20,7 @@ internal sealed class SpotifyTokenResponse
     public string? RefreshToken { get; set; }
 }
 
-internal sealed class SpotifyCurrentUserResponse
+public sealed class SpotifyCurrentUserResponse
 {
     [JsonPropertyName("id")]
     public string Id { get; set; } = string.Empty;
@@ -38,7 +38,7 @@ internal sealed class SpotifyCurrentUserResponse
     public string? Product { get; set; }
 }
 
-internal sealed class SpotifyTrackApiResponse
+public sealed class SpotifyTrackApiResponse
 {
     [JsonPropertyName("id")]
     public string Id { get; set; } = string.Empty;
@@ -68,19 +68,19 @@ internal sealed class SpotifyTrackApiResponse
     public SpotifyAlbum? Album { get; set; }
 }
 
-internal sealed class SpotifyExternalUrls
+public sealed class SpotifyExternalUrls
 {
     [JsonPropertyName("spotify")]
     public string? Spotify { get; set; }
 }
 
-internal sealed class SpotifyArtist
+public sealed class SpotifyArtist
 {
     [JsonPropertyName("name")]
     public string Name { get; set; } = string.Empty;
 }
 
-internal sealed class SpotifyAlbum
+public sealed class SpotifyAlbum
 {
     [JsonPropertyName("name")]
     public string Name { get; set; } = string.Empty;
@@ -89,7 +89,7 @@ internal sealed class SpotifyAlbum
     public List<SpotifyImage> Images { get; set; } = [];
 }
 
-internal sealed class SpotifyImage
+public sealed class SpotifyImage
 {
     [JsonPropertyName("url")]
     public string Url { get; set; } = string.Empty;

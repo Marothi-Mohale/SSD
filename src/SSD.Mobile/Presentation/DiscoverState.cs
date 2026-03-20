@@ -5,7 +5,7 @@ namespace SSD.Mobile.Presentation;
 
 public sealed class DiscoverState
 {
-    public MoodCategory SelectedMood { get; set; } = MoodCategory.Calm;
+    public MoodCategory SelectedMood { get; set; } = MoodCategory.Relaxed;
 
     public string? Energy { get; set; } = "low";
 

@@ -1,3 +1,4 @@
+#pragma warning disable CA1848
 using System.Net;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -160,3 +161,4 @@ internal sealed class SpotifyService(
         }
     }
 }
+#pragma warning restore CA1848

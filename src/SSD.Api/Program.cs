@@ -4,7 +4,6 @@ using System.Text;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using SSD.Api.Models;
 using SSD.Application.Abstractions;
@@ -12,7 +11,6 @@ using SSD.Application.Contracts.Auth;
 using SSD.Application.Exceptions;
 using SSD.Application.Contracts;
 using SSD.Application.Contracts.Spotify;
-using SSD.Infrastructure.Auth;
 using SSD.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);

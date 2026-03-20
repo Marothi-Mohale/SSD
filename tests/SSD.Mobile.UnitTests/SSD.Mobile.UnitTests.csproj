@@ -2,7 +2,7 @@
   <PropertyGroup>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
-    <DisableTransitiveProjectReferences>true</DisableTransitiveProjectReferences>
+    <NoWarn>$(NoWarn);CA1707</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,8 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../src/SSD.Mobile/SSD.Mobile.csproj" SkipGetTargetFrameworkProperties="true" />
-    <ProjectReference Include="../../src/SSD.Domain/SSD.Domain.csproj" SkipGetTargetFrameworkProperties="true" />
+    <ProjectReference Include="../../src/SSD.Mobile/SSD.Mobile.csproj" />
+    <ProjectReference Include="../../src/SSD.Domain/SSD.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

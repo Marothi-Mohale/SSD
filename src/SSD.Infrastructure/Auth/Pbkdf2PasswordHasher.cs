@@ -36,22 +36,26 @@ public sealed class Pbkdf2PasswordHasher : IPasswordHasher
             return false;
         }
 
-        Span<byte> salt = stackalloc byte[SaltSize];
-        Span<byte> expectedHash = stackalloc byte[KeySize];
+        byte[] salt;
+        byte[] expectedHash;
 
-        if (!Convert.TryFromHexString(parts[2], salt, out var saltBytesWritten) ||
-            !Convert.TryFromHexString(parts[3], expectedHash, out var hashBytesWritten))
+        try
+        {
+            salt = Convert.FromHexString(parts[2]);
+            expectedHash = Convert.FromHexString(parts[3]);
+        }
+        catch (FormatException)
         {
             return false;
         }
 
         var actualHash = Rfc2898DeriveBytes.Pbkdf2(
             password,
-            salt[..saltBytesWritten],
+            salt,
             iterations,
             HashAlgorithmName.SHA512,
-            hashBytesWritten);
+            expectedHash.Length);
 
-        return CryptographicOperations.FixedTimeEquals(actualHash, expectedHash[..hashBytesWritten]);
+        return CryptographicOperations.FixedTimeEquals(actualHash, expectedHash);
     }
 }

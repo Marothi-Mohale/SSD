@@ -18,10 +18,10 @@ jobs:
           dotnet-version: 10.0.x
 
       - name: Restore
-        run: dotnet restore SSD.sln
+        run: dotnet restore SSD.sln -m:1
 
       - name: Build
-        run: dotnet build SSD.sln --configuration Release --no-restore
+        run: dotnet build SSD.sln --configuration Release --no-restore -m:1
 
       - name: Test
-        run: dotnet test SSD.sln --configuration Release --no-build --verbosity normal
+        run: dotnet test SSD.sln --configuration Release --no-build --verbosity normal -m:1

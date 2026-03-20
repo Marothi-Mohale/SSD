@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Net.Http.Headers;
 using System.Text.Json;
 using Microsoft.Extensions.Options;
 using SSD.Application.Exceptions;
@@ -59,7 +60,7 @@ public sealed class SpotifyApiClient(HttpClient httpClient, IOptions<SpotifyOpti
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
         using var response = await httpClient.SendAsync(request, cancellationToken);
-        return await ReadResponseAsync<SpotifyCurrentUserResponse>(response, cancellationToken, "spotify_profile_unavailable", HttpStatusCode.BadRequest);
+        return await ReadResponseAsync<SpotifyCurrentUserResponse>(response, "spotify_profile_unavailable", HttpStatusCode.BadRequest, cancellationToken);
     }
 
     public async Task<SpotifyTrackApiResponse> GetTrackAsync(string trackId, string accessToken, CancellationToken cancellationToken)
@@ -79,24 +80,24 @@ public sealed class SpotifyApiClient(HttpClient httpClient, IOptions<SpotifyOpti
             throw new IntegrationException("spotify_track_unavailable", "The Spotify track is not available in the current market.", 403);
         }
 
-        return await ReadResponseAsync<SpotifyTrackApiResponse>(response, cancellationToken, "spotify_track_unavailable", HttpStatusCode.BadRequest);
+        return await ReadResponseAsync<SpotifyTrackApiResponse>(response, "spotify_track_unavailable", HttpStatusCode.BadRequest, cancellationToken);
     }
 
-    private async Task<SpotifyTokenResponse> ReadTokenResponseAsync(HttpResponseMessage response, CancellationToken cancellationToken)
+    private static async Task<SpotifyTokenResponse> ReadTokenResponseAsync(HttpResponseMessage response, CancellationToken cancellationToken)
     {
         if (response.StatusCode == HttpStatusCode.BadRequest || response.StatusCode == HttpStatusCode.Unauthorized)
         {
             throw new IntegrationException("spotify_token_error", "Spotify token exchange failed.", 502);
         }
 
-        return await ReadResponseAsync<SpotifyTokenResponse>(response, cancellationToken, "spotify_token_error", HttpStatusCode.BadGateway);
+        return await ReadResponseAsync<SpotifyTokenResponse>(response, "spotify_token_error", HttpStatusCode.BadGateway, cancellationToken);
     }
 
     private static async Task<T> ReadResponseAsync<T>(
         HttpResponseMessage response,
-        CancellationToken cancellationToken,
         string code,
-        HttpStatusCode failureStatus)
+        HttpStatusCode failureStatus,
+        CancellationToken cancellationToken)
     {
         if (!response.IsSuccessStatusCode)
         {
