@@ -1,14 +1,14 @@
 <Solution>
-  <Folder Name="/src/" />
-  <Folder Name="/src/Backend/">
-    <Project Path="src/Backend/SSD.Api/SSD.Api.csproj" />
-    <Project Path="src/Backend/SSD.Application/SSD.Application.csproj" />
-    <Project Path="src/Backend/SSD.Domain/SSD.Domain.csproj" />
-  </Folder>
-  <Folder Name="/src/Mobile/">
-    <Project Path="src/Mobile/SSD.Mobile/SSD.Mobile.csproj" />
+  <Folder Name="/src/">
+    <Project Path="src/SSD.Api/SSD.Api.csproj" />
+    <Project Path="src/SSD.Application/SSD.Application.csproj" />
+    <Project Path="src/SSD.Domain/SSD.Domain.csproj" />
+    <Project Path="src/SSD.Infrastructure/SSD.Infrastructure.csproj" />
+    <Project Path="src/SSD.Mobile/SSD.Mobile.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/SSD.Api.Tests/SSD.Api.Tests.csproj" />
+    <Project Path="tests/SSD.Application.Tests/SSD.Application.Tests.csproj" />
+    <Project Path="tests/SSD.Mobile.UnitTests/SSD.Mobile.UnitTests.csproj" />
   </Folder>
 </Solution>

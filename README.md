@@ -2,64 +2,65 @@
 
 SSD stands for Special Sound & Screen Discovery.
 
-It is a mood-based mobile app that recommends music, movies, or both based on how the user feels. The target stack is:
+This repository is a production-oriented .NET monorepo for a mood-based platform that recommends music and movies. It is structured so the domain and application layers stay isolated from transport and deployment concerns, while the API, infrastructure, mobile-facing code, tests, and deployment assets can evolve independently.
 
-- .NET MAUI mobile app
-- ASP.NET Core Web API backend
-- PostgreSQL in production
-- SQLite for local mobile persistence
+## Monorepo Layout
 
-## Current Milestone
-
-This repository now contains the first project foundation:
-
-- `src/Backend/SSD.Api`: minimal API for recommendation discovery
-- `src/Backend/SSD.Application`: application services and contracts
-- `src/Backend/SSD.Domain`: core domain models
-- `src/Mobile/SSD.Mobile`: initial .NET MAUI app shell
-- `tests/SSD.Api.Tests`: backend test project
-
-## Implemented So Far
-
-- Mood-driven recommendation discovery endpoint
-- In-memory seed recommendation provider shaped for future Spotify/TMDb integrations
-- Validation and correlation-aware API responses
-- Initial MAUI shell with mood selection and recommendation cards
-- Test project scaffold for backend validation rules
-
-## API Example
-
-`POST /api/recommendations/discover`
-
-```json
-{
-  "mood": "Calm",
-  "energy": "low",
-  "timeOfDay": "evening",
-  "familyFriendlyOnly": true,
-  "includeMusic": true,
-  "includeMovies": true
-}
+```text
+src/
+  SSD.Api
+  SSD.Application
+  SSD.Domain
+  SSD.Infrastructure
+  SSD.Mobile
+tests/
+  SSD.Api.Tests
+  SSD.Application.Tests
+  SSD.Mobile.UnitTests
+deploy/
+.github/workflows/
 ```
 
-## Build Notes
+## Technology Choices
 
-Backend commands in this environment should use:
+- .NET 10 via [global.json](/workspaces/SSD/global.json)
+- ASP.NET Core for the API host
+- Clean architecture boundaries across `Domain`, `Application`, `Infrastructure`, and `Api`
+- Centralized package management in [Directory.Packages.props](/workspaces/SSD/Directory.Packages.props)
+- Shared repository-wide build standards in [Directory.Build.props](/workspaces/SSD/Directory.Build.props) and [.editorconfig](/workspaces/SSD/.editorconfig)
+
+## Quick Start
+
+1. Copy [.env.example](/workspaces/SSD/.env.example) into your local environment or secrets manager.
+2. Copy [appsettings.Template.json](/workspaces/SSD/src/SSD.Api/appsettings.Template.json) to `appsettings.Development.json` if you want local API overrides.
+3. Restore, build, and test:
 
 ```bash
-DOTNET_CLI_HOME=/workspaces/SSD/.dotnet-home dotnet build
+HOME=/workspaces/SSD/.home DOTNET_CLI_HOME=/workspaces/SSD/.dotnet-home NUGET_PACKAGES=/workspaces/SSD/.nuget/packages dotnet restore SSD.sln
+HOME=/workspaces/SSD/.home DOTNET_CLI_HOME=/workspaces/SSD/.dotnet-home NUGET_PACKAGES=/workspaces/SSD/.nuget/packages dotnet build SSD.sln --no-restore
+HOME=/workspaces/SSD/.home DOTNET_CLI_HOME=/workspaces/SSD/.dotnet-home NUGET_PACKAGES=/workspaces/SSD/.nuget/packages dotnet test SSD.sln --no-build
 ```
 
-Notes:
+4. Run the API:
 
-- The current container does not have .NET MAUI workloads installed, so the mobile project is scaffolded but may not build here yet.
-- Test package restore may need network access to NuGet depending on sandbox permissions.
+```bash
+HOME=/workspaces/SSD/.home DOTNET_CLI_HOME=/workspaces/SSD/.dotnet-home NUGET_PACKAGES=/workspaces/SSD/.nuget/packages dotnet run --project src/SSD.Api/SSD.Api.csproj
+```
+
+## What Is Included
+
+- A minimal recommendation API with health checks and mood discovery
+- Domain entities and value objects for recommendation matching
+- Application services and interfaces for orchestration
+- Infrastructure seed data provider ready to be replaced with Spotify and TMDb integrations
+- A workload-free `SSD.Mobile` project that holds mobile-facing presentation models and formatting logic while staying buildable in CI
+- Unit test projects for API, application, and mobile logic
+- Baseline container and CI assets in [deploy](/workspaces/SSD/deploy/README.md) and [ci.yml](/workspaces/SSD/.github/workflows/ci.yml)
 
 ## Next Steps
 
-- Add ASP.NET Core identity and token-based authentication
-- Add PostgreSQL persistence and EF Core migrations
-- Add SQLite offline persistence in the mobile app
-- Replace seed recommendations with Spotify and TMDb integrations
-- Add favorites, history, and recommendation explanation persistence
-- Add CI/CD and deployment automation
+- Add PostgreSQL persistence in `SSD.Infrastructure`
+- Introduce authentication and secure token flows
+- Replace the seed provider with Spotify and TMDb adapters
+- Add a MAUI app head once the target build environment includes the required workloads
+- Expand CI with linting, coverage reporting, and deployment environments

@@ -1,5 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
@@ -20,13 +19,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="Xunit" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="../../src/SSD.Api/SSD.Api.csproj" SkipGetTargetFrameworkProperties="true" />
-    <ProjectReference Include="../../src/SSD.Application/SSD.Application.csproj" SkipGetTargetFrameworkProperties="true" />
+    <ProjectReference Include="../../src/SSD.Mobile/SSD.Mobile.csproj" SkipGetTargetFrameworkProperties="true" />
     <ProjectReference Include="../../src/SSD.Domain/SSD.Domain.csproj" SkipGetTargetFrameworkProperties="true" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
 </Project>

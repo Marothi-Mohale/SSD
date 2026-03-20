@@ -5,6 +5,13 @@
 
 # dotenv files
 .env
+.env.*
+!.env.example
+
+# local dotnet state
+.dotnet-home/
+.home/
+.nuget/
 
 # User-specific files
 *.rsuser
@@ -59,6 +66,7 @@ dlldata.c
 
 # Benchmark Results
 BenchmarkDotNet.Artifacts/
+TestResults/
 
 # .NET
 project.lock.json

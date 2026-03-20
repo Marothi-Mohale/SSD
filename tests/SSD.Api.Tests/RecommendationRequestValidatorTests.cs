@@ -21,4 +21,20 @@ public sealed class RecommendationRequestValidatorTests
 
         Assert.Contains("Select at least one recommendation type.", errors);
     }
+
+    [Fact]
+    public void Validate_ReturnsNoErrors_ForValidRequest()
+    {
+        var request = new DiscoverRecommendationsRequest(
+            MoodCategory.Cozy,
+            "low",
+            "night",
+            true,
+            IncludeMusic: true,
+            IncludeMovies: true);
+
+        var errors = RecommendationRequestValidator.Validate(request);
+
+        Assert.Empty(errors);
+    }
 }

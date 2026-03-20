@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>SSD.Mobile</RootNamespace>
+    <AssemblyName>SSD.Mobile</AssemblyName>
+    <DisableTransitiveProjectReferences>true</DisableTransitiveProjectReferences>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../SSD.Domain/SSD.Domain.csproj" SkipGetTargetFrameworkProperties="true" />
+  </ItemGroup>
+</Project>
