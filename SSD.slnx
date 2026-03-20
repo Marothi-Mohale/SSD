@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Backend/">
+    <Project Path="src/Backend/SSD.Api/SSD.Api.csproj" />
+    <Project Path="src/Backend/SSD.Application/SSD.Application.csproj" />
+    <Project Path="src/Backend/SSD.Domain/SSD.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Mobile/">
+    <Project Path="src/Mobile/SSD.Mobile/SSD.Mobile.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SSD.Api.Tests/SSD.Api.Tests.csproj" />
+  </Folder>
+</Solution>
