@@ -2,6 +2,7 @@ using SSD.Application.Abstractions;
 using SSD.Application.Contracts;
 using SSD.Domain.Entities;
 using SSD.Domain.ValueObjects;
+using SSD.Domain.Enums;
 
 namespace SSD.Application.Services;
 
@@ -21,8 +22,8 @@ public sealed class RecommendationService(
 
         var selection = new MoodSelection(
             request.Mood,
-            request.Energy,
-            request.TimeOfDay,
+            ParseEnergyLevel(request.Energy),
+            ParseTimeOfDay(request.TimeOfDay),
             request.FamilyFriendlyOnly,
             request.IncludeMusic,
             request.IncludeMovies);
@@ -47,5 +48,29 @@ public sealed class RecommendationService(
                 ? "No recommendations were found for the selected mood."
                 : $"Found {ordered.Length} recommendations tailored to the selected mood.",
             ordered);
+    }
+
+    private static EnergyLevel? ParseEnergyLevel(string? energy)
+    {
+        if (string.IsNullOrWhiteSpace(energy))
+        {
+            return null;
+        }
+
+        return Enum.TryParse<EnergyLevel>(energy, true, out var parsed)
+            ? parsed
+            : null;
+    }
+
+    private static TimeOfDaySegment? ParseTimeOfDay(string? timeOfDay)
+    {
+        if (string.IsNullOrWhiteSpace(timeOfDay))
+        {
+            return null;
+        }
+
+        return Enum.TryParse<TimeOfDaySegment>(timeOfDay, true, out var parsed)
+            ? parsed
+            : null;
     }
 }

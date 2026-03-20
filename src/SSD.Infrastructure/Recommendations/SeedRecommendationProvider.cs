@@ -134,12 +134,12 @@ public sealed class SeedRecommendationProvider : IRecommendationProvider
             var whyItMatches = Signals.ToList();
             var score = BaseScore;
 
-            if (!string.IsNullOrWhiteSpace(selection.Energy))
+            if (selection.EnergyLevel.HasValue)
             {
-                whyItMatches.Add($"Energy filter: {selection.Energy}");
+                whyItMatches.Add($"Energy filter: {selection.EnergyLevel.Value}");
             }
 
-            if (!string.IsNullOrWhiteSpace(selection.TimeOfDay))
+            if (selection.TimeOfDay.HasValue)
             {
                 whyItMatches.Add($"Time of day: {selection.TimeOfDay}");
             }
