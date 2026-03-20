@@ -34,7 +34,11 @@ public sealed class LinkedSpotifyAccount : AuditableEntity
 
     public string? SubscriptionTier { get; private set; }
 
+    public string? Email { get; private set; }
+
     public string EncryptedRefreshToken { get; private set; }
+
+    public string? EncryptedAccessToken { get; private set; }
 
     public DateTimeOffset? AccessTokenExpiresUtc { get; private set; }
 
@@ -49,4 +53,36 @@ public sealed class LinkedSpotifyAccount : AuditableEntity
     public List<string> GrantedScopes { get; private set; }
 
     public User? User { get; private set; }
+
+    public void UpdateTokens(string encryptedRefreshToken, string? encryptedAccessToken, DateTimeOffset? accessTokenExpiresUtc)
+    {
+        EncryptedRefreshToken = encryptedRefreshToken;
+        EncryptedAccessToken = encryptedAccessToken;
+        AccessTokenExpiresUtc = accessTokenExpiresUtc;
+        Touch();
+    }
+
+    public void UpdateProfile(string spotifyUserId, string? spotifyDisplayName, string? email, string? countryCode, string? subscriptionTier, IEnumerable<string> grantedScopes)
+    {
+        SpotifyUserId = spotifyUserId;
+        SpotifyDisplayName = spotifyDisplayName;
+        Email = email;
+        CountryCode = countryCode;
+        SubscriptionTier = subscriptionTier;
+        GrantedScopes = grantedScopes
+            .Where(scope => !string.IsNullOrWhiteSpace(scope))
+            .Select(scope => scope.Trim())
+            .Distinct(StringComparer.Ordinal)
+            .ToList();
+        Status = SpotifyLinkStatus.Active;
+        LastSyncedUtc = DateTimeOffset.UtcNow;
+        Touch(LastSyncedUtc);
+    }
+
+    public void MarkRevoked(DateTimeOffset? revokedUtc = null)
+    {
+        RevokedUtc = revokedUtc ?? DateTimeOffset.UtcNow;
+        Status = SpotifyLinkStatus.Revoked;
+        Touch(RevokedUtc);
+    }
 }

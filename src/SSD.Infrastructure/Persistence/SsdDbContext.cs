@@ -138,9 +138,11 @@ public sealed class SsdDbContext(DbContextOptions<SsdDbContext> options) : DbCon
         account.Property(x => x.AccessTokenExpiresUtc).HasColumnType("timestamp with time zone");
         account.Property(x => x.SpotifyUserId).HasMaxLength(120);
         account.Property(x => x.SpotifyDisplayName).HasMaxLength(120);
+        account.Property(x => x.Email).HasMaxLength(320);
         account.Property(x => x.CountryCode).HasMaxLength(5);
         account.Property(x => x.SubscriptionTier).HasMaxLength(50);
         account.Property(x => x.EncryptedRefreshToken).HasColumnType("text");
+        account.Property(x => x.EncryptedAccessToken).HasColumnType("text");
         account.Property(x => x.GrantedScopes).HasJsonbStringListConversion();
         account.HasIndex(x => x.UserId).IsUnique();
         account.HasIndex(x => x.SpotifyUserId).IsUnique();

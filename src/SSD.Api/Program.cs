@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.RateLimiting;
@@ -10,6 +11,7 @@ using SSD.Application.Abstractions;
 using SSD.Application.Contracts.Auth;
 using SSD.Application.Exceptions;
 using SSD.Application.Contracts;
+using SSD.Application.Contracts.Spotify;
 using SSD.Infrastructure.Auth;
 using SSD.Infrastructure;
 
@@ -77,6 +79,17 @@ app.UseExceptionHandler(handlerApp =>
                 authException.Code,
                 authException.Message,
                 authException.Errors,
+                correlationId));
+            return;
+        }
+
+        if (exception is IntegrationException integrationException)
+        {
+            context.Response.StatusCode = integrationException.StatusCode;
+            await context.Response.WriteAsJsonAsync(new ApiErrorResponse(
+                integrationException.Code,
+                integrationException.Message,
+                integrationException.Errors,
                 correlationId));
             return;
         }
@@ -225,6 +238,69 @@ app.MapGet("/api/auth/me", (ClaimsPrincipal user) =>
         role = user.FindFirstValue(ClaimTypes.Role),
         sessionId = user.FindFirstValue("sid")
     });
+}).RequireAuthorization();
+
+var spotifyGroup = app.MapGroup("/api/spotify");
+
+spotifyGroup.MapPost("/resolve-track", async (
+    SpotifyResolveTrackRequest request,
+    ISpotifyService spotifyService,
+    HttpContext httpContext,
+    CancellationToken cancellationToken) =>
+{
+    if (string.IsNullOrWhiteSpace(request.Url))
+    {
+        return Results.BadRequest(new ApiErrorResponse(
+            "validation_error",
+            "The Spotify track request was invalid.",
+            ["Spotify track URL is required."],
+            httpContext.TraceIdentifier));
+    }
+
+    var result = await spotifyService.ResolveTrackAsync(request.Url, cancellationToken);
+    return Results.Ok(result);
+});
+
+spotifyGroup.MapGet("/link/start", async (
+    ClaimsPrincipal user,
+    ISpotifyService spotifyService,
+    HttpContext httpContext,
+    CancellationToken cancellationToken) =>
+{
+    var userId = user.GetUserId();
+    if (userId is null)
+    {
+        return Results.Unauthorized();
+    }
+
+    var result = await spotifyService.CreateLinkStartAsync(userId.Value, cancellationToken);
+    return Results.Ok(result);
+}).RequireAuthorization();
+
+spotifyGroup.MapGet("/link/callback", async (
+    string code,
+    string state,
+    ISpotifyService spotifyService,
+    CancellationToken cancellationToken) =>
+{
+    var result = await spotifyService.CompleteLinkAsync(code, state, cancellationToken);
+    return Results.Ok(result);
+});
+
+spotifyGroup.MapGet("/me", async (
+    ClaimsPrincipal user,
+    ISpotifyService spotifyService,
+    HttpContext httpContext,
+    CancellationToken cancellationToken) =>
+{
+    var userId = user.GetUserId();
+    if (userId is null)
+    {
+        return Results.Unauthorized();
+    }
+
+    var result = await spotifyService.GetLinkedAccountAsync(userId.Value, cancellationToken);
+    return Results.Ok(result);
 }).RequireAuthorization();
 
 app.Run();
